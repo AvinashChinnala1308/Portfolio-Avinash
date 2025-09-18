@@ -71,88 +71,121 @@ export const Navbar = () => {
 
   const [navList, setNavList] = useState<boolean>(false);
   return (
-    <nav className="fixed z-50 top-0 text-white w-full bg-[#0F0F0F] dark:text-white border-b border-white">
+    <nav className="fixed z-50 top-0 w-full glass-card backdrop-blur-xl border-b border-neutral-200/50 dark:border-neutral-700/50">
       {isLoading && <LoadingOverlay />}
-      <div className="lg:px-36 flex items-center justify-between max-lg:px-8">
-        <img src={logo} className="w-44 h-20 relative" />
-        <div className="flex items-center text-2xl gap-3 lg:gap-10">
-          {/* lg navlist */}
-          <ul className="flex items-center gap-10 max-lg:hidden cursor-pointer">
-            {listName.map((item: IListName) => {
-              return (
-                <div
-                  key={item.name}
-                  className={`flex items-center gap-3 cursor-pointer  ${
-                    location.pathname === item.url &&
-                    "text-[#32B280] font-semibold"
-                  }`}
-                >
-                  <motion.div whileHover={{ scale: 1.1 }}>
-                    <item.icon
-                      className="cursor-pointer"
-                      onClick={() => handleClickList(item.url)}
-                    />
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.1 }}>
-                    <a
-                      className={``}
-                      onClick={() => handleClickList(item.url)}
-                      key={item.name}
-                    >
-                      {item.name}
-                    </a>
-                  </motion.div>
-                </div>
-              );
-            })}
-          </ul>
-          {darkmode ? (
-            <motion.div whileHover={{ scale: 1.1 }}>
-              {" "}
-              <div
-                className="text-4xl cursor-pointer"
-                onClick={handleClickMode}
-              >
-                <WiDaySunny />
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div whileHover={{ scale: 1.1 }}>
-              {" "}
-              <div className="mr-2 cursor-pointer" onClick={handleClickMode}>
-                <RxMoon />
-              </div>
-            </motion.div>
-          )}
-
-          <span
-            className="text-4xl cursor-pointer lg:hidden"
-            onClick={() => setNavList(!navList)}
+      <div className="container-custom">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex-shrink-0"
           >
-            {navList ? <AiFillCloseCircle /> : <IoMdMenu />}
-          </span>
+            <img src={logo} className="h-12 w-auto" alt="Avinash Chinnala" />
+          </motion.div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-8">
+              {listName.map((item: IListName) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <motion.div
+                    key={item.name}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="relative"
+                  >
+                    <button
+                      onClick={() => handleClickList(item.url)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 focus-ring ${
+                        isActive
+                          ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                      }`}
+                    >
+                      <item.icon className="text-lg" />
+                      {item.name}
+                    </button>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute inset-0 bg-primary-100 dark:bg-primary-900/30 rounded-xl -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right side - Theme toggle and mobile menu */}
+          <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleClickMode}
+              className="p-3 glass-card rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 focus-ring"
+            >
+              {darkmode ? (
+                <WiDaySunny className="text-xl text-warning" />
+              ) : (
+                <RxMoon className="text-xl text-info" />
+              )}
+            </motion.button>
+
+            {/* Mobile menu button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setNavList(!navList)}
+              className="md:hidden p-3 glass-card rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 focus-ring"
+            >
+              {navList ? (
+                <AiFillCloseCircle className="text-xl text-error" />
+              ) : (
+                <IoMdMenu className="text-xl text-muted-foreground" />
+              )}
+            </motion.button>
+          </div>
         </div>
       </div>
-      <ul
-        className={`absolute w-screen flex flex-col items-center py-4 gap-4 bg-[#0F0F0F] text-[#F1F1F1] dark:bg-opacity-95 bg-opacity-95 duration-200 ${
-          navList ? "" : "-translate-y-64"
-        } dark:text-black dark:bg-[#F1F1F1]`}
+
+      {/* Mobile Navigation */}
+      <motion.div
+        initial={false}
+        animate={{
+          height: navList ? "auto" : 0,
+          opacity: navList ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+        className="md:hidden overflow-hidden"
       >
-        {listName.map((item: IListName) => {
-          return (
-            <a
-              key={item.name}
-              className={`flex items-center gap-3 cursor-pointer ${
-                location.pathname === item.url && "font-semibold text-[#32B280]"
-              }`}
-              onClick={() => handleClickList(item.url)}
-            >
-              <item.icon />
-              {item.name}
-            </a>
-          );
-        })}
-      </ul>
+        <div className="px-4 pt-2 pb-3 space-y-1 glass-card backdrop-blur-xl">
+          {listName.map((item: IListName) => {
+            const isActive = location.pathname === item.url;
+            return (
+              <motion.button
+                key={item.name}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleClickList(item.url)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 focus-ring ${
+                  isActive
+                    ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30"
+                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                }`}
+              >
+                <item.icon className="text-lg" />
+                {item.name}
+              </motion.button>
+            );
+          })}
+        </div>
+      </motion.div>
     </nav>
   );
 };
